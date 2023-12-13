@@ -67,113 +67,93 @@ class Field {
     }
     return nestedArray;
   }
-  // Update currentposition
   updateCurrentPosition(direction) {
-    //console.log(direction);
     let row = this.currentRow;
     let column = this.currentColumn;
-    console.log(`your position was ${this.currentPosition}`);
-    //let newPosition = this.grid[row][column];
-    //this.currentPosition = newPosition;
-    //this.grid[row][column] = pathCharacter;
-    //console.log(this.grid[0][5]);
-    console.log(`your row is ${row}`)
-
-    if(direction === 'u') {
-        if (row > 0) {
-          // calc new coordinates
-          row -= 1;
-        } else {
-          console.log('you can\'t go up');
-        }
-    }
-    if(direction === 'l') { 
-      return 'you put left';
-    }
-      // logic for right
-    if(direction === 'r') {
-        if (column !== gridWidth-1) {
-          // calc new coordinates
-          this.currentColumn += 1;
-          let newPosition = this.grid[this.currentRow][this.currentColumn];
-          // update current position
-          this.currentPosition = newPosition;
-          if (this.currentPosition === holeCharacter) {
-            // if is hole you die
-            this.gameState = "lose";
-            console.log(`the gamestate is ${this.gameState}`);
-          } else if (this.currentPosition === hatCharacter) {
-            // else if hat you win
-            this.gameState = "win";
-          } else {
-            // else update to star
-            this.grid[this.currentRow][this.currentColumn] = pathCharacter;
-          }
-        } else {
-          return 'you can\'t go right';
-        }
-    }
-    if(direction === 'd') {
-        return 'you put down';
+    
+    const updatePositionInField = () => {
+      let newPosition = this.grid[this.currentRow][this.currentColumn];
+      // update current position
+      this.currentPosition = newPosition;
+      if (this.currentPosition === holeCharacter) {
+        // if is hole you die
+        this.gameState = "lose";
+      } else if (this.currentPosition === hatCharacter) {
+      // else if hat you win
+        this.gameState = "win";
+      } else {
+      // else update to star
+        this.grid[this.currentRow][this.currentColumn] = pathCharacter;
+      }
     }
     
-    // testing logs
-    console.log(`your new position is ${this.currentPosition}`);
-    console.log(`your current row is ${this.currentRow}`);
-    console.log(`your current column is ${this.currentColumn}`);
+    if(direction === 'u') {
+      if (row > 0) {
+        this.currentRow -= 1;
+        updatePositionInField();
+        return true;
+      } else {
+        return false;
+      }
+    }
+    if(direction === 'l') { 
+      if (column > 0 ) {
+        this.currentColumn -=1;
+        updatePositionInField();
+        return true;
+      } else {
+        return false;
+      }
+    }
+    if(direction === 'r') {
+      if (column < gridWidth-1) {
+        this.currentColumn += 1;
+        updatePositionInField();
+        return true;
+      } else {
+        return false;
+      }
+    }
+    if(direction === 'd') {
+      if (row < gridHeight-1) {
+        this.currentRow += 1;
+        updatePositionInField();
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 }
 
-
-// create game class
-class Game {
-  constructor() {
-  }
-  playGame() {
-    // create playfield
-    const myField = new Field();
-    // render playfield
-    console.log(myField.print());
-    // ask for direction
-    while (myField.gameState === 'play') {
-    let askQuestion = prompt('Which direction would you like to go?');
-    //console.log(askQuestion);
-    // handle user input
-    let handleInput = this.handleUserInput(askQuestion);
-    console.log(handleInput);
+// THE MAIN GAMELOOP
+const playGame = () => {
+  // create playfield and log it to terminal
+  const myField = new Field();
+  console.log(`\nWelcome to Find Your Hat!.\nNavigate to your hat ^ to win.\nEnter u, l, r or d to move left, up, right or down.\n\n${myField.print()}`);
+  while (myField.gameState === 'play') {
+    // ask for user input
+    let userInput = prompt('Which direction would you like to go? ');
     // if valid direction was entered update current position and re-render field
-    if (handleInput !== 'please enter u, d, l, or r') {
-      myField.updateCurrentPosition(askQuestion);
+    if (userInput === 'u' || userInput === 'l' || userInput === 'r' || userInput === 'd') {
+      let updateField = myField.updateCurrentPosition(userInput);
       // re-render field
-      console.log(myField.print());
-    }
-    } 
-    if (myField.gameState === 'lose') {
-      console.log ('GAME OVER');
-    } else if (myField.gameState === 'win') {
-      console.log('You found your hat, you win!');
+      console.log(`\n${myField.print()}`);
+      if (!updateField) {
+        console.log('you can\'t go that way!\n');
+      }
     } else {
-      console.log('something went wrong ....');
+      console.log ('Invalid input. Please enter u, d, l, or r.\n');
     }
-  }
-  handleUserInput(input) {
-    const direction = input;
-    switch(direction) {
-      case 'u':
-        return 'you put up';
-      case 'l': 
-        return 'you put left';
-      case 'r':
-        return 'you put right';
-      case 'd':
-        return 'you put down';
-      default:
-        return 'please enter u, d, l, or r';
-    }
+  } 
+  if (myField.gameState === 'lose') {
+    console.log ('You fell in a hole ...\nGAME OVER');
+  } else if (myField.gameState === 'win') {
+    console.log('You found your hat!\nYOU WIN!');
+  } else {
+    console.log('something went wrong ....');
   }
 }
 
-
-// create a field instance using the generated grid and print it
-const game = new Game();
-game.playGame();
+// run the game
+playGame();

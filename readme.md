@@ -10,4 +10,6 @@ This Project generates a playfield of chosen size (set in the config variables),
 Download the project, extract the files and run using ``node main.js``.
 
 ## Roadmap
-This will be updated once the overall functionality of the game is completed and has been tested.
+- Update the game loop so that the player can play again without having to restart the game.
+- trim the user input and convert it to lowercase to avoid user errors.
+- I may separate the code into modules.
